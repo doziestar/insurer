@@ -1,3 +1,4 @@
+import APIDataModel from '@/models/secret.model';
 import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_USER, NODE_ENV } from '@config';
 import UserModel from '@models/users.model';
 import { logger } from '@utils/logger';
@@ -29,6 +30,7 @@ sequelize.authenticate();
 
 const DB = {
   Users: UserModel(sequelize),
+  APIData: APIDataModel(sequelize),
   sequelize, // connection instance (RAW queries)
   Sequelize, // library
 };

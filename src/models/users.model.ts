@@ -1,11 +1,13 @@
-import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import { User } from '@interfaces/users.interface';
+import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 
 export type UserCreationAttributes = Optional<User, 'id' | 'email' | 'password'>;
 
 export class UserModel extends Model<User, UserCreationAttributes> implements User {
   public id: number;
   public email: string;
+  public firstName: string;
+  public lastName: string;
   public password: string;
 
   public readonly createdAt!: Date;
@@ -22,6 +24,14 @@ export default function (sequelize: Sequelize): typeof UserModel {
       },
       email: {
         allowNull: false,
+        type: DataTypes.STRING(45),
+      },
+      firstName: {
+        allowNull: true,
+        type: DataTypes.STRING(45),
+      },
+      lastName: {
+        allowNull: true,
         type: DataTypes.STRING(45),
       },
       password: {
