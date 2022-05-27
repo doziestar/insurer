@@ -30,14 +30,14 @@ services:
     depends_on:
       - mysql
   mysql:
-    image: mysql:5.7
-    container_name: mysql
+    image: postgres:9.6
+    container_name: insurer_postgres
     environment:
-      MYSQL_ROOT_USER: root
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: test
+      POSTGRES_ROOT_USER: root
+      POSTGRES_ROOT_PASSWORD: password
+      POSTGRES_DATABASE: test
     ports:
-      - '3306:3306'
+      - '3306:5432'
     networks:
       - backend
 
