@@ -1,34 +1,37 @@
 import { IApiData } from '@/interfaces/secret.interface';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import { DataTypes, Model, Sequelize } from 'sequelize';
 
 const SALT_ROUNDS = 10;
 
 export class APIDataModel extends Model<IApiData> implements IApiData {
-  generateAPIKey(): string {
-    throw new Error('Method not implemented.');
+  async generateAPIKey(): Promise<string> {
+    return crypto.randomBytes(32).toString('hex');
   }
-  generateAPISecret(): string {
-    throw new Error('Method not implemented.');
+
+  async generateAPISecret(): Promise<string> {
+    return crypto.randomBytes(32).toString('hex');
   }
-  reHashAPIKey(): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  async validateAPIKey(apiKey: string): Promise<boolean> {
+    const isValid = await bcrypt.compare(apiKey, this.ApiKey);
+    return isValid;
   }
-  reHashAPISecret(): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  async validateAPISecret(apiSecret: string): Promise<boolean> {
+    const isValid = await bcrypt.compare(apiSecret, this.ApiSecret);
+    return isValid;
   }
-  validateAPIKey(apiKey: string): Promise<boolean> {
-    throw new Error('Method not implemented.');
+
+  async hashAPIKey(): Promise<void> {
+    this.ApiKey = await bcrypt.hash(this.ApiKey.toString(), SALT_ROUNDS);
   }
-  validateAPISecret(apiSecret: string): Promise<boolean> {
-    throw new Error('Method not implemented.');
+
+  async hashAPISecret(): Promise<void> {
+    this.ApiSecret = await bcrypt.hash(this.ApiSecret.toString(), SALT_ROUNDS);
   }
-  hashAPIKey(): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-  hashAPISecret(): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
+
   public ApiKey: string;
   public ApiSecret: string;
   public userId: number;
@@ -58,10 +61,12 @@ export default function (sequelize: Sequelize): typeof APIDataModel {
       sequelize,
       hooks: {
         beforeCreate: async (apiData: APIDataModel) => {
-          const hash = await bcrypt.hash(apiData.ApiSecret, SALT_ROUNDS);
-          apiData.ApiSecret = hash;
-          const apiKey = await bcrypt.hash(apiData.ApiKey, SALT_ROUNDS);
-          apiData.ApiKey = apiKey;
+          await apiData.hashAPIKey();
+          await apiData.hashAPISecret();
+        },
+        beforeUpdate: async (apiData: APIDataModel) => {
+          await apiData.hashAPIKey();
+          await apiData.hashAPISecret();
         },
       },
     },

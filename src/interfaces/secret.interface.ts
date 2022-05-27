@@ -3,11 +3,8 @@ export interface IApiData {
   ApiSecret: string;
   userId: number;
 
-  generateAPIKey?(): string;
-  generateAPISecret?(): string;
-
-  reHashAPIKey?(): Promise<void>;
-  reHashAPISecret?(): Promise<void>;
+  generateAPIKey?(): Promise<string>;
+  generateAPISecret?(): Promise<string>;
 
   validateAPIKey?(apiKey: string): Promise<boolean>;
   validateAPISecret?(apiSecret: string): Promise<boolean>;
