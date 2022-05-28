@@ -1,11 +1,13 @@
 import { IApiData } from '@/interfaces/secret.interface';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import { DataTypes, Model, Sequelize } from 'sequelize';
+import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 
 const SALT_ROUNDS = 10;
 
-export class APIDataModel extends Model<IApiData> implements IApiData {
+type APIData = Optional<IApiData, 'ApiKey' | 'ApiSecret'>;
+
+export class APIDataModel extends Model<IApiData, APIData> implements IApiData {
   async generateAPIKey(): Promise<string> {
     return crypto.randomBytes(32).toString('hex');
   }
@@ -30,6 +32,11 @@ export class APIDataModel extends Model<IApiData> implements IApiData {
 
   async hashAPISecret(): Promise<void> {
     this.ApiSecret = await bcrypt.hash(this.ApiSecret.toString(), SALT_ROUNDS);
+  }
+
+  public async destroySecret(): Promise<void> {
+    this.ApiKey = null;
+    this.ApiSecret = null;
   }
 
   public ApiKey: string;

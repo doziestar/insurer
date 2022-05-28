@@ -11,4 +11,6 @@ export interface IApiData {
 
   hashAPIKey?(): Promise<void>;
   hashAPISecret?(): Promise<void>;
+
+  destroySecret?(): Promise<void>;
 }
